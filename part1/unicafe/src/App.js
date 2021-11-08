@@ -14,6 +14,11 @@ const App = () => {
     setState(value);
   }
 
+
+  const total = good + neutral + bad;
+  const average = total / 3;
+  const positive = parseFloat((good / total) * 100);
+
   return (
     <div>
       <Header text='give feedback' />
@@ -24,6 +29,9 @@ const App = () => {
       <Paragraph text='good' value={good} />
       <Paragraph text='neutral' value={neutral} />
       <Paragraph text='bad' value={bad} />
+      <Paragraph text='all' value={total} />
+      <Paragraph text='average' value={average} />
+      <Paragraph text='positive' value={positive} />
     </div>
   )
 }
