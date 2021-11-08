@@ -16,6 +16,7 @@ const App = () => {
   return (
     <div>
       {anecdotes[selected]}
+      <button>next anecdote</button>
     </div>
   )
 }
