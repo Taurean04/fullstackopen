@@ -5,7 +5,8 @@ const Header = ({course}) => {
   return(<h1>{course}</h1>)
 }
 
-const Total = ({total}) => {
+const Total = ({parts}) => {
+  const total = parts.reduce((p, c) => p + c.exercises, 0);
   return (<p>Total of {total} exercises</p>);
 }
 
@@ -13,18 +14,9 @@ const Part = ({name, exercise}) => {
   return(<p>{name} {exercise}</p>);
 }
 
-const Content = ({content}) => {   
-  let total = 0;
-  const rendered = content.map((item) => {
-    total += item.exercises
-    return content = <Part key={item.id} name={item.name} exercise={item.exercises}/>
-  })
-  return(
-    <>
-    {rendered}
-    <Total total={total} />
-    </>
-  );
+const Content = ({content}) => {
+  const rendered = content.map((item) => <Part key={item.id} name={item.name} exercise={item.exercises} />);
+  return(<>{rendered}</>);
 }
 
 const Course = ({course}) => {
@@ -32,12 +24,14 @@ const Course = ({course}) => {
     <>
       <Header course={course.name} />
       <Content content={course.parts} />
+      <Total parts={course.parts} />
     </>
   )
 }
 
 const App = () => {
   const course = {
+    id: 1,
     name: 'Half Stack application development',
     parts: [
       {
