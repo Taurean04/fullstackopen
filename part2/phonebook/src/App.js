@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 
 const Input = ({text, value, onChange}) => (<div>{text}: <input value={value} onChange={onChange}/></div>);
 const PersonForm = ({onSubmit, input}) => (
   <form onSubmit={onSubmit}>
-    {input.map(i => (<Input text={i.text} value={i.value} onChange={i.onChange} />))}
+    {input.map(i => (<Input key={i.id} text={i.text} value={i.value} onChange={i.onChange} />))}
     <div>
       <button type='submit'>Add</button>
     </div>
@@ -20,16 +21,18 @@ const Persons = ({persons, filter}) => {
 }
 
 const App = () => {
-  const [ persons, setPersons ] = useState([
-    { name: 'Arto Hellas', number: '040-123456', id: 1 },
-    { name: 'Ada Lovelace', number: '39-44-5323523', id: 2 },
-    { name: 'Dan Abramov', number: '12-43-234345', id: 3 },
-    { name: 'Mary Poppendieck', number: '39-23-6423122', id: 4 }
-  ]);
+  const [ persons, setPersons ] = useState([]);
   const [ newName, setNewName ] = useState('');
   const [ newNumber, setNewNumber ] = useState('');
   const [ filter, setFilter ] = useState('');
 
+  useEffect(() => {
+    axios
+      .get('http://localhost:3001/persons')
+      .then(res => {
+        setPersons(res.data);
+      });
+  }, []);
 
   const addPersons = (e) => {
     e.preventDefault();
