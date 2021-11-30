@@ -10,16 +10,28 @@ const Country = ({country}) => (
     <ul>{Object.values(country.languages).map((language, i) => <li key={i}>{language}</li>)}</ul>
     <img src={country.flags.png} alt={country.name.common}></img>
   </>
-)
+);
 
-const Result = ({countries}) => {
+const Result = ({countries, handleClick, show}) => {
   let result;
   if(countries.length > 10){
-    result = 'Too many matches found, specify another filter'
+    result = 'Too many matches found, specify another filter';
   }else if(countries.length === 1){
-    result = <Country key={countries} country={countries[0]}/>
+    result = <Country country={countries[0]} styles={{display: 'block'}}/>;
   }else if(countries.length <= 10){
-    result = <ul>{countries.map((country, i) => <li key={i}>{country.name.common}</li>)}</ul>;
+    result = <ul>{
+      countries.map((country, i) => {
+        return <>
+        <li key={i}>
+          {country.name.common}
+          <button onClick={() => handleClick(i)}>
+            Show
+          </button>
+          {show[i] ? <Country key={country.name.common} country={country} /> : null}
+        </li>
+        </>
+      })
+    }</ul>;
   }
   return (<div>{result}</div>)
 }
@@ -37,17 +49,28 @@ const App = () => {
       });
   }, []);
   
-  let filtered = countries.filter(country => country.name.common.toLowerCase().indexOf(search.toLowerCase()) !== -1);
+  let filtered = countries.filter(country => {
+    country.show = false
+    return country.name.common.toLowerCase().indexOf(search.toLowerCase()) !== -1;
+  });
+
+  const [ show, setShow ] = useState(Array(filtered.length).fill(false));
 
   const handleSearchChange = (e) => {
     setSearch(e.target.value);
+  }
+
+  const handleClick = (index) => {
+    const updated = [...show];
+    updated[index] = !updated[index];
+    setShow(updated);
   }
 
   return (
     <div>
       Countries
       <div>find countries: <input value={search} onChange={handleSearchChange}/></div>
-      <Result countries={filtered} />
+      <Result countries={filtered} handleClick={handleClick} show={show} />
     </div>
   )
 }
