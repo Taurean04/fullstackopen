@@ -25,22 +25,22 @@ const Country = ({country}) => (
   </>
 );
 
-const Result = ({countries, handleClick, show}) => {
+const Result = ({countries, handleClick}) => {
   let result;
   if(countries.length > 10){
     result = 'Too many matches found, specify another filter';
   }else if(countries.length === 1){
-    result = <Country country={countries[0]} styles={{display: 'block'}}/>;
+    result = <Country country={countries[0]}/>;
   }else if(countries.length <= 10){
     result = <ul>{
-      countries.map((country, i) => {
+      countries.map((country) => {
         return (
-          <li key={i}>
+          <li key={country.id}>
             {country.name.common}
-            <button onClick={() => handleClick(i)}>
+            <button onClick={() => handleClick(country.id)}>
               Show
             </button>
-            {show[i] ? <Country country={country} /> : null}
+            {country.show ? <Country country={country} /> : null}
           </li>
         )
       })
@@ -55,7 +55,9 @@ const App = () => {
   const [ search, setSearch ] = useState('');
 
   const getCountries = res => {
-    res.data.map(data => {
+    res.data.map((data, i) => {
+      data.id = i + 1;
+      data.show = false;
       let fails = ['Ngerulmud', 'Fakaofo', 'Naypyidaw', 'Kyiv'];
       if(data.capital && data.capital[0] !== undefined && !fails.includes(data.capital[0])) {
         if(data.capital[0] === 'Papeetē'){
@@ -85,23 +87,21 @@ const App = () => {
 
   let filtered = countries.filter(country => country.name.common.toLowerCase().indexOf(search.toLowerCase()) !== -1);
 
-  const [ show, setShow ] = useState(Array(filtered.length).fill(false));
-
   const handleSearchChange = (e) => {
     setSearch(e.target.value);
   }
 
-  const handleClick = (index) => {
-    const updated = [...show];
-    updated[index] = !updated[index];
-    setShow(updated);
+  const handleClick = (id) => {
+    const updated = countries.find(c => c.id === id);
+    const update = {...updated, show: !updated.show};
+    setCountries(countries.map(c => c.id !== id ? c : update));
   }
 
   return (
     <div>
       Countries
       <div>find countries: <input value={search} onChange={handleSearchChange}/></div>
-      <Result countries={filtered} handleClick={handleClick} show={show} />
+      <Result countries={filtered} handleClick={handleClick} />
     </div>
   )
 }
