@@ -1,24 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import personService from './services/persons';
-
-const Input = ({text, value, onChange}) => (<div>{text}: <input value={value} onChange={onChange}/></div>);
-const PersonForm = ({onSubmit, input}) => (
-  <form onSubmit={onSubmit}>
-    {input.map(i => (<Input key={i.id} text={i.text} value={i.value} onChange={i.onChange} />))}
-    <div>
-      <button type='submit'>Add</button>
-    </div>
-  </form>
-);
-const Person = ({name, number}) => (<li>{name} {number}</li>);
-const Persons = ({persons, filter}) => {
-  let filtered = persons.filter(person => person.name.toLowerCase().indexOf(filter.toLowerCase()) !== -1);
-  return (
-    <ul>{
-      filtered.map(person => <Person key={person.id} name={person.name} number={person.number} />)
-    }</ul>
-  );
-}
+import PersonForm from './components/PersonForm';
+import Persons from './components/Persons';
+import Input from './components/Input';
 
 const App = () => {
   const [ persons, setPersons ] = useState([]);
@@ -67,6 +51,19 @@ const App = () => {
     setFilter(e.target.value);
   }
 
+  const handleDelete = (id) => {
+    const deleted = persons.find(person => person.id === id);
+    if(window.confirm(`Delete ${deleted.name}?`)){
+      personService
+        .remove(id)
+        .then(() => {
+          const changed = [...persons];
+          changed.splice(persons.indexOf(deleted), 1);
+          setPersons(changed);
+        });
+    }
+  }
+
   let inputObject = [
     {
       id: 1,
@@ -90,7 +87,7 @@ const App = () => {
       <PersonForm onSubmit={addPersons} input={inputObject} />
       <h3>Numbers</h3>
       <div>
-        <Persons persons={persons} filter={filter} />
+        <Persons persons={persons} filter={filter} remove={handleDelete} />
       </div>
     </div>
   )
