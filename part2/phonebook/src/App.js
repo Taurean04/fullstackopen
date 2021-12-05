@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import personService from './services/persons';
 
 const Input = ({text, value, onChange}) => (<div>{text}: <input value={value} onChange={onChange}/></div>);
 const PersonForm = ({onSubmit, input}) => (
@@ -27,10 +27,10 @@ const App = () => {
   const [ filter, setFilter ] = useState('');
 
   useEffect(() => {
-    axios
-      .get('http://localhost:3001/persons')
-      .then(res => {
-        setPersons(res.data);
+    personService
+      .getAll()
+      .then(initial => {
+        setPersons(initial);
       });
   }, []);
 
@@ -45,9 +45,14 @@ const App = () => {
       name: newName,
       number: newNumber
     }
-    setPersons(persons.concat(personObject));
-    setNewName('');
-    setNewNumber('');
+
+    personService
+      .create(personObject)
+      .then(created => {
+        setPersons(persons.concat(created));
+        setNewName('');
+        setNewNumber('');
+      });
   }
 
   const handleNameChange = (e) => {
