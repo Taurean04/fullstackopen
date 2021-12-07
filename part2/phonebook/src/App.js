@@ -22,7 +22,18 @@ const App = () => {
     e.preventDefault();
     let nameExists = persons.find(person => person.name.toLowerCase() === newName.toLowerCase());
     if(nameExists) {
-      return alert(`${newName} is already added to phonebook`);
+      if(window.confirm(`${nameExists.name} is already added to phonebook. replace the old number with a new one?`)){
+        const update = {...nameExists, number: newNumber};
+        return personService
+          .update(nameExists.id, update)
+          .then(updated => {
+            setPersons(persons.map(p => p.id !== nameExists.id ? p : updated));
+            setNewName('');
+            setNewNumber('');
+          });
+      }else{
+        return alert(`${newName} is already added to phonebook`);
+      }
     }
     const personObject = {
       id: persons[persons.length - 1].id + 1,
