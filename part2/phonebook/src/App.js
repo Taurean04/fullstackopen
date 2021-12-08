@@ -40,6 +40,13 @@ const App = () => {
             setPersons(persons.map(p => p.id !== nameExists.id ? p : updated));
             setNewName('');
             setNewNumber('');
+          })
+          .catch(e => {
+            setErrorMessage(`Information of ${nameExists.name} has already been removed from server`);
+            setTimeout(() => {
+              setErrorMessage(null);
+            }, 5000);
+            setPersons(persons.filter(p => p.id !== nameExists.id))
           });
       }else{
         return setErrorMessage(`${newName} is already added to phonebook`);
